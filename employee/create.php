@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $userRole = !empty($role) ? mysqli_real_escape_string($conn, $role) : 'employee';
                 
                 // Create user account in user table
-                $userSql = "INSERT INTO user (Username, Password, Email, Role, EmployeeID, IsActive, EmailVerified) VALUES ('$username', '$password', '$email', '$userRole', $employeeID, 1, 1)";
+                $userSql = "INSERT INTO user (Username, Password, Email, Role, EmployeeID, IsActive) VALUES ('$username', '$password', '$email', '$userRole', $employeeID, 1)";
                 if (!mysqli_query($conn, $userSql)) {
                     throw new Exception('Error creating user account: ' . mysqli_error($conn));
                 }

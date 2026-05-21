@@ -12,6 +12,5 @@ ADD COLUMN `PaymentMethod` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 ALTER TABLE `order`
 ADD COLUMN `CancellationReason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `PaymentMethod`;
 
-ALTER TABLE `user`
-ADD COLUMN `EmailVerified` tinyint(1) NOT NULL DEFAULT 0 AFTER `IsActive`,
-ADD COLUMN `VerificationToken` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `EmailVerified`;
+-- EmailVerified and VerificationToken columns were previously added here but have been removed
+-- as the email verification feature was unstable and has been disabled.

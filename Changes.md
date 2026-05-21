@@ -44,14 +44,9 @@
 - Admin dashboard (`index.php`): Added a "Supplier Stock Overview" card showing total stock items, total stock value, and product count
 - Supplier list (`supplier/supplierpage.php`): Added columns for Total Products, Total Stock, and Stock Value per supplier, showing aggregated stock data from the `plant` table
 
-## Email Verification
-- Added email verification for all personas upon registration
-- After registration, a verification email is sent via Resend API with a unique link
-- Users must verify their email before admin can approve the account
-- Admin approval page shows email verification status (Verified/Pending)
-- Approve button is disabled for unverified accounts with a helpful message
-- All new accounts (including customers) now require admin approval after email verification
-- Login gate checks email verification status before account approval status
-- Existing users are automatically marked as email verified (migration friendly)
-- New columns added to `user` table: `EmailVerified` (TINYINT), `VerificationToken` (VARCHAR 64)
-- Admin-created accounts (via create pages) are auto-verified
+## Email Verification (REMOVED - unstable)
+- Email verification feature has been removed due to instability
+- `verify_email.php`, `includes/mail_helper.php`, `resend_example.php` deleted
+- Registration no longer sends verification emails; accounts go straight to pending approval
+- Login gate no longer checks `EmailVerified`
+- Admin approval page no longer shows verification status or blocks unverified accounts

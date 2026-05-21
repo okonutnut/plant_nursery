@@ -119,7 +119,6 @@ include '../includes/header.php';
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Role</th>
-                            <th>Email Verified</th>
                             <th>Username</th>
                             <th>Registered Date</th>
                             <th class="text-end">Actions</th>
@@ -149,23 +148,13 @@ include '../includes/header.php';
                                         <?php echo strtoupper(htmlspecialchars($account['Role'])); ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <?php if ($account['EmailVerified'] == 1): ?>
-                                        <span class="badge bg-success">Verified</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                    <?php endif; ?>
-                                </td>
                                 <td><?php echo htmlspecialchars($account['Username']); ?></td>
                                 <td><?php echo date('M d, Y H:i', strtotime($account['CreatedAt'])); ?></td>
                                 <td class="text-end">
                                     <form method="POST" action="" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to approve this account?');">
                                         <input type="hidden" name="user_id" value="<?php echo $account['UserID']; ?>">
                                         <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn btn-success btn-sm" <?php echo $account['EmailVerified'] == 0 ? 'disabled' : ''; ?>><?php echo $account['EmailVerified'] == 0 ? 'Awaiting Verification' : 'Approve'; ?></button>
-                                        <?php if ($account['EmailVerified'] == 0): ?>
-                                            <br><small class="text-muted">User has not verified email</small>
-                                        <?php endif; ?>
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
                                     </form>
                                     <form method="POST" action="" style="display: inline-block; margin-left: 0.5rem;" onsubmit="return confirm('Are you sure you want to reject and delete this account? This action cannot be undone.');">
                                         <input type="hidden" name="user_id" value="<?php echo $account['UserID']; ?>">

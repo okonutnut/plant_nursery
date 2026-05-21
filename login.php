@@ -58,9 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $supplierID = null;
                         $isActive = 0; // All accounts require admin approval
                         
-                        // Generate email verification token
-                        $verificationToken = bin2hex(random_bytes(32));
-                        
                         if ($role === 'customer') {
                             // Insert customer
                             $sql = "INSERT INTO customer (Name, Email, Phone, Address) VALUES ('$name', '$email', '$phone', '$address')";
@@ -89,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         
                         // Create user account in user table
-                        $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, EmployeeID, SupplierID, IsActive, EmailVerified, VerificationToken) VALUES ('$username', '$password', '$email', '$role', " . 
-                                   ($customerID ? $customerID : 'NULL') . ", " . ($employeeID ? $employeeID : 'NULL') . ", " . ($supplierID ? $supplierID : 'NULL') . ", $isActive, 0, '$verificationToken')";
+                        $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, EmployeeID, SupplierID, IsActive) VALUES ('$username', '$password', '$email', '$role', " . 
+                                   ($customerID ? $customerID : 'NULL') . ", " . ($employeeID ? $employeeID : 'NULL') . ", " . ($supplierID ? $supplierID : 'NULL') . ", $isActive)";
                         if (!mysqli_query($conn, $userSql)) {
                             throw new Exception('Error creating user account: ' . mysqli_error($conn));
                         }
@@ -100,16 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Commit transaction
                         mysqli_commit($conn);
                         
-                        require_once 'includes/mail_helper.php';
-                        
-                        // Send verification email
-                        $emailSent = sendVerificationEmail($email, $username, $verificationToken);
-                        
-                        if ($emailSent) {
-                            $success = 'Registration successful! A verification link has been sent to your email. Please verify your email before an administrator can approve your account.';
-                        } else {
-                            $success = 'Registration successful! However, we could not send the verification email. Please contact support. Your account is pending approval.';
-                        }
+                        $success = 'Registration successful! Your account is pending approval. Please wait for an administrator to approve your account.';
                         $isRegister = true; // Keep registration form visible
                     } catch (Exception $e) {
                         // Rollback transaction on error
@@ -132,9 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($user && $user['Password'] === $password) {
                 // Check if account is active
-                if ($user['EmailVerified'] == 0) {
-                    $error = 'Please verify your email address before logging in. Check your inbox for the verification link.';
-                } elseif ($user['IsActive'] == 0) {
+                if ($user['IsActive'] == 0) {
                     $error = 'Your account is pending approval. Please wait for an administrator to approve your account before logging in.';
                 } else {
                     // Login successful

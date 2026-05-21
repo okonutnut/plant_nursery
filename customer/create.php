@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Create user account in user table with CustomerID link
                 // Role is set to 'customer' for all customer accounts
-                $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, IsActive, EmailVerified) VALUES ('$username', '$password', '$email', 'customer', $customerID, 1, 1)";
+                $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, IsActive) VALUES ('$username', '$password', '$email', 'customer', $customerID, 1)";
                 if (!mysqli_query($conn, $userSql)) {
                     throw new Exception('Error creating user account: ' . mysqli_error($conn));
                 }
