@@ -33,7 +33,7 @@
 Each entity module follows: `{entity}/{page,create,edit,delete}.php`.
 - `plant/`, `plantcategory/`, `planttype/`, `supplier/`, `customer/`, `employee/`, `order/`, `refund/`, `user/`
 - `includes/` — shared `header.php` (sidebar nav + auth gate) and `footer.php`
-- `shop/` — customer-facing: `shop.php`, `cart.php`, `checkout.php`, `my_orders.php`, `request_refund.php`
+- `shop/` — customer-facing: `shop.php`, `cart.php`, `checkout.php`, `my_orders.php`, `view_order.php`, `cancel_order.php`, `request_refund.php`, `mark_successful.php`
 - `seller/` — seller/staff: `orders.php`, `refunds.php`, `approve_order.php`, `process_refund.php`
 - `supplier_panel/` — supplier persona: `dashboard.php`, `products.php`, `create.php`, `edit.php`, `delete.php`, `restock.php` (own `includes/` header/footer)
 - `admin/` — currently only `approve_accounts.php`
@@ -52,3 +52,5 @@ Each entity module follows: `{entity}/{page,create,edit,delete}.php`.
 - `supplier_panel/products.php` has a search input that filters by name/scientific name, works alongside the stock filter.
 - `Changes.md` has a log of recent feature changes.
 - Supplier users have `SupplierID` FK in `user` table (added via `ALTER TABLE user ADD COLUMN SupplierID int NULL DEFAULT NULL`).
+- `order` table has `PaymentMethod` column (`varchar(50)`, added via `ALTER TABLE`). Set during customer checkout (`shop/checkout.php`). Supported values: `Cash on Delivery`, `GCash`, `Bank Transfer`. Displayed in customer order detail, seller view, and admin panels.
+- Cancellation: customers cancel via `shop/cancel_order.php`. Only allowed when `Status = 'Pending'` (not yet shipped/approved). Sets `Status = 'Cancelled'`. Seller and admin `approve_order.php` both reject cancelled orders.
