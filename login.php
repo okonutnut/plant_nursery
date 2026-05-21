@@ -56,7 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $customerID = null;
                         $employeeID = null;
                         $supplierID = null;
-                        $isActive = 0; // All accounts require admin approval
+                        // Customers are auto-approved; other roles require admin approval
+                        $isActive = ($role === 'customer') ? 1 : 0;
                         
                         if ($role === 'customer') {
                             // Insert customer
@@ -97,7 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Commit transaction
                         mysqli_commit($conn);
                         
-                        $success = 'Registration successful! Your account is pending approval. Please wait for an administrator to approve your account.';
+                        if ($role === 'customer') {
+                            $success = 'Registration successful! You can now login with your credentials.';
+                        } else {
+                            $success = 'Registration successful! Your account is pending approval. Please wait for an administrator to approve your account.';
+                        }
                         $isRegister = true; // Keep registration form visible
                     } catch (Exception $e) {
                         // Rollback transaction on error
@@ -310,7 +315,7 @@ border: 1px solid rgba(255, 255, 255, 0.3);
                         <option value="supplier" <?php echo (isset($_POST['role']) && $_POST['role'] === 'supplier') ? 'selected' : ''; ?>>Supplier</option>
                         <option value="admin" <?php echo (isset($_POST['role']) && $_POST['role'] === 'admin') ? 'selected' : ''; ?>>Admin</option>
                     </select>
-                    <small class="form-text text-muted">Seller/Staff, Supplier, and Admin accounts require approval before login</small>
+                    <small class="form-text text-muted">Customers are auto-activated. Seller/Staff, Supplier, and Admin accounts require approval before login</small>
                 </div>
                 
                 <hr class="my-3">

@@ -76,7 +76,7 @@ $result = mysqli_query($conn, "
     LEFT JOIN customer c ON u.CustomerID = c.CustomerID
     LEFT JOIN employee e ON u.EmployeeID = e.EmployeeID
     LEFT JOIN supplier s ON u.SupplierID = s.SupplierID
-    WHERE u.IsActive = 0
+    WHERE u.IsActive = 0 AND u.Role != 'customer'
     ORDER BY u.CreatedAt DESC
 ");
 if ($result) {

@@ -21,7 +21,7 @@ if ($refundResult) {
 
 // Get pending account approvals count
 $counts['pending_approvals'] = 0;
-$approvalResult = mysqli_query($conn, "SELECT COUNT(*) as count FROM user WHERE IsActive = 0");
+$approvalResult = mysqli_query($conn, "SELECT COUNT(*) as count FROM user WHERE IsActive = 0 AND Role != 'customer'");
 if ($approvalResult) {
     $approvalRow = mysqli_fetch_assoc($approvalResult);
     $counts['pending_approvals'] = $approvalRow['count'];
