@@ -34,6 +34,16 @@
 - **Product management**: Filtered by `plant.SupplierID` matching the supplier's linked company
 - **Restock**: Dedicated page where supplier adds quantity to existing stock
 
+## Cancellation Reason
+- Added `CancellationReason` text column to `order` table
+- Customers now provide a reason when cancelling an order via a modal form (instead of a simple confirm dialog)
+- Cancellation reason is displayed in customer order detail, admin order views, and seller order views
+- `shop/cancel_order.php` now accepts POST requests with a `reason` field
+
+## Supplier Stock Visibility for Admin
+- Admin dashboard (`index.php`): Added a "Supplier Stock Overview" card showing total stock items, total stock value, and product count
+- Supplier list (`supplier/supplierpage.php`): Added columns for Total Products, Total Stock, and Stock Value per supplier, showing aggregated stock data from the `plant` table
+
 ## Email Verification
 - Added email verification for all personas upon registration
 - After registration, a verification email is sent via Resend API with a unique link

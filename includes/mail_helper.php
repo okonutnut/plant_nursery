@@ -67,9 +67,16 @@ function sendVerificationEmail($to, $username, $token)
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        error_log("Resend API error: HTTP $httpCode - cURL: " . ($curlError ?: 'none') . " - Response: " . ($response ?: 'empty'));
+    }
 
     return $httpCode >= 200 && $httpCode < 300;
 }

@@ -7,12 +7,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     exit;
 }
 
-if (!isset($_GET['id'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id'])) {
     header("Location: my_orders.php");
     exit;
 }
 
-$orderID = (int)$_GET['id'];
+$orderID = (int)$_POST['id'];
+$reason = isset($_POST['reason']) ? trim($_POST['reason']) : '';
+
+if (empty($reason)) {
+    header("Location: view_order.php?id=$orderID&error=Please provide a reason for cancellation");
+    exit;
+}
 
 $userEmail = $_SESSION['email'];
 $customerResult = mysqli_query($conn, "SELECT CustomerID FROM customer WHERE Email = '$userEmail' LIMIT 1");
@@ -42,9 +48,10 @@ if (strtolower($order['Status']) !== 'pending') {
     exit;
 }
 
+$reasonEscaped = mysqli_real_escape_string($conn, $reason);
 $updateResult = mysqli_query($conn, "
     UPDATE `order`
-    SET Status = 'Cancelled'
+    SET Status = 'Cancelled', CancellationReason = '$reasonEscaped'
     WHERE OrderID = $orderID AND CustomerID = $customerID AND Status = 'Pending'
 ");
 

@@ -415,9 +415,17 @@ include 'includes/header.php';
                     <div class="info-group">
                         <label>Actions</label>
                         <div class="value">
-                            <a href="cancel_order.php?id=<?php echo $orderID; ?>" class="btn-request-refund" style="background: #dc3545; color: white; text-decoration: none;" onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.')">
+                            <button class="btn-request-refund" style="background: #dc3545; color: white; text-decoration: none; border: none; cursor: pointer;" onclick="openCancelModal()">
                                 <i class="fas fa-times-circle"></i> Cancel Order
-                            </a>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (strtolower($order['Status']) === 'cancelled' && !empty($order['CancellationReason'])): ?>
+                    <div class="info-group">
+                        <label>Cancellation Reason</label>
+                        <div class="value" style="background: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 5px; margin-top: 0.25rem;">
+                            <?php echo htmlspecialchars($order['CancellationReason']); ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -514,6 +522,27 @@ include 'includes/header.php';
             </table>
         </div>
 
+        <!-- Cancel Order Modal -->
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Cancel Order #<?php echo $orderID; ?></h3>
+                    <span class="close" onclick="closeCancelModal()">&times;</span>
+                </div>
+                <form method="POST" action="cancel_order.php">
+                    <input type="hidden" name="id" value="<?php echo $orderID; ?>">
+                    
+                    <div class="form-group">
+                        <label for="reason">Reason for Cancellation *</label>
+                        <textarea name="reason" id="cancel_reason" required placeholder="Please tell us why you want to cancel this order (e.g., changed my mind, found a better price, ordered by mistake, etc.)"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" style="background: #dc3545;">Confirm Cancellation</button>
+                    <button type="button" class="btn-submit" style="background: #6c757d; margin-top: 0.5rem;" onclick="closeCancelModal()">Keep Order</button>
+                </form>
+            </div>
+        </div>
+
         <!-- Refund Request Modal -->
         <div id="refundModal" class="modal">
             <div class="modal-content">
@@ -546,6 +575,14 @@ include 'includes/header.php';
         </div>
 
     <script>
+        function openCancelModal() {
+            document.getElementById('cancelModal').style.display = 'block';
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+        }
+
         function openRefundModal(orderItemID, plantName, maxQuantity) {
             document.getElementById('order_item_id').value = orderItemID;
             document.getElementById('plant_name').value = plantName;
@@ -560,9 +597,13 @@ include 'includes/header.php';
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('refundModal');
-            if (event.target == modal) {
+            const refundModal = document.getElementById('refundModal');
+            const cancelModal = document.getElementById('cancelModal');
+            if (event.target == refundModal) {
                 closeRefundModal();
+            }
+            if (event.target == cancelModal) {
+                closeCancelModal();
             }
         }
 

@@ -7,6 +7,23 @@ $suppliers = mysqli_fetch_all($result, MYSQLI_ASSOC);
 $countResult = mysqli_query($conn, "SELECT COUNT(*) as total FROM supplier");
 $totalCount = mysqli_fetch_assoc($countResult)['total'];
 
+// Get stock data per supplier
+$stockData = [];
+$stockResult = mysqli_query($conn, "
+    SELECT s.SupplierID,
+           COUNT(p.PlantID) as TotalProducts,
+           COALESCE(SUM(p.QuantityAvailable), 0) as TotalQuantity,
+           COALESCE(SUM(p.QuantityAvailable * p.Price), 0) as TotalValue
+    FROM supplier s
+    LEFT JOIN plant p ON s.SupplierID = p.SupplierID
+    GROUP BY s.SupplierID
+");
+if ($stockResult) {
+    while ($row = mysqli_fetch_assoc($stockResult)) {
+        $stockData[$row['SupplierID']] = $row;
+    }
+}
+
 $pageTitle = 'Suppliers';
 include '../includes/header.php';
 ?>
@@ -29,19 +46,27 @@ include '../includes/header.php';
                             <th>Contact</th>
                             <th>Email</th>
                             <th>Address</th>
+                            <th>Total Products</th>
+                            <th>Total Stock</th>
+                            <th>Stock Value</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
                         $counter = 1;
-                        foreach ($suppliers as $supplier): ?>
+                        foreach ($suppliers as $supplier): 
+                            $stock = $stockData[$supplier['SupplierID']] ?? ['TotalProducts' => 0, 'TotalQuantity' => 0, 'TotalValue' => 0];
+                        ?>
                             <tr>
                                 <td>#<?php echo $counter; ?></td>
                                 <td><?php echo htmlspecialchars($supplier['Name']); ?></td>
                                 <td><?php echo htmlspecialchars($supplier['Contact'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($supplier['Email'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($supplier['Address'] ?? 'N/A'); ?></td>
+                                <td><?php echo $stock['TotalProducts']; ?></td>
+                                <td><?php echo $stock['TotalQuantity']; ?></td>
+                                <td>₱<?php echo number_format($stock['TotalValue'], 2); ?></td>
                                 <td class="text-end">
                                     <div class="d-flex gap-2 justify-content-end">
                                         <a href="edit.php?id=<?php echo $supplier['SupplierID']; ?>" class="btn btn-warning btn-sm">Edit</a>
@@ -64,4 +89,3 @@ include '../includes/header.php';
 </div>
 
 <?php include '../includes/footer.php'; ?>
-

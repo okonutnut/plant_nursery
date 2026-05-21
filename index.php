@@ -71,6 +71,30 @@ include 'includes/header.php';
     <div class="col-md-6 col-lg-4 col-xl-3">
         <div class="card dashboard-card h-100">
             <div class="card-body text-center">
+                <h5 class="card-title text-primary">Supplier Stock Overview</h5>
+                <?php
+                $stockSummary = mysqli_fetch_assoc(mysqli_query($conn, "
+                    SELECT COUNT(p.PlantID) as TotalProducts,
+                           COALESCE(SUM(p.QuantityAvailable), 0) as TotalQuantity,
+                           COALESCE(SUM(p.QuantityAvailable * p.Price), 0) as TotalValue
+                    FROM plant p
+                "));
+                ?>
+                <div class="count" style="font-size: 1.5rem;"><?php echo $stockSummary['TotalQuantity']; ?></div>
+                <small style="color: #666;">Total Items in Stock</small>
+                <div style="margin-top: 0.5rem; font-size: 0.85rem;">
+                    <span>₱<?php echo number_format($stockSummary['TotalValue'], 2); ?> Value</span>
+                    <span style="margin: 0 0.5rem; color: #ddd;">|</span>
+                    <span><?php echo $stockSummary['TotalProducts']; ?> Products</span>
+                </div>
+                <a href="plant/plantpage.php" class="text-decoration-none" style="display: block; margin-top: 0.25rem;">View Inventory →</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 col-xl-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
                 <h5 class="card-title text-primary">Plants</h5>
                 <div class="count"><?php echo $counts['plant']; ?></div>
                 <a href="plant/plantpage.php" class="text-decoration-none">View All →</a>

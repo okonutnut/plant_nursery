@@ -118,6 +118,16 @@ include 'includes/header.php';
                     <td><?php echo htmlspecialchars($order['PaymentMethod']); ?></td>
                 </tr>
                 <?php endif; ?>
+                <?php if ($order['Status'] === 'Cancelled' && !empty($order['CancellationReason'])): ?>
+                <tr>
+                    <th>Cancellation Reason</th>
+                    <td>
+                        <div style="background: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 5px;">
+                            <?php echo htmlspecialchars($order['CancellationReason']); ?>
+                        </div>
+                    </td>
+                </tr>
+                <?php endif; ?>
                 <tr>
                     <th>Total Amount</th>
                     <td style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);">

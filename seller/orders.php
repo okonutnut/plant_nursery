@@ -90,6 +90,7 @@ include 'includes/header.php';
                                 <th>Customer</th>
                                 <th>Total Amount</th>
                                 <th>Status</th>
+                                <th>Cancellation Reason</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -124,6 +125,13 @@ include 'includes/header.php';
                                             <?php endif; ?>
                                             <?php echo htmlspecialchars($order['Status']); ?>
                                         </span>
+                                    </td>
+                                    <td style="max-width: 200px;">
+                                        <?php if ($order['Status'] === 'Cancelled' && !empty($order['CancellationReason'])): ?>
+                                            <span style="color: #721c24; font-size: 0.9rem;"><?php echo htmlspecialchars($order['CancellationReason']); ?></span>
+                                        <?php else: ?>
+                                            <span style="color: #999;">—</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <div class="action-buttons">

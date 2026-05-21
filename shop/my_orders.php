@@ -274,7 +274,7 @@ $cartCount = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
                                 <td>
                                     <a href="view_order.php?id=<?php echo $order['OrderID']; ?>" class="btn-view">View Details</a>
                                     <?php if (strtolower($order['Status']) === 'pending'): ?>
-                                        <a href="cancel_order.php?id=<?php echo $order['OrderID']; ?>" class="btn-view" style="background: #dc3545;" onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.')">Cancel</a>
+                                        <button class="btn-view" style="background: #dc3545; border: none; cursor: pointer;" onclick="openCancelModal(<?php echo $order['OrderID']; ?>)">Cancel</button>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -346,6 +346,46 @@ $cartCount = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
         filterOrders();
     });
     <?php endif; ?>
+</script>
+
+<!-- Cancel Order Modal -->
+<div id="cancelModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: white; margin: 10% auto; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: var(--primary-color);">Cancel Order</h3>
+            <span class="close" onclick="closeCancelModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        </div>
+        <form method="POST" action="cancel_order.php">
+            <input type="hidden" name="id" id="cancel_order_id">
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="reason" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">Reason for Cancellation *</label>
+                <textarea name="reason" id="cancel_reason" required placeholder="Please tell us why you want to cancel this order (e.g., changed my mind, found a better price, ordered by mistake, etc.)" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; box-sizing: border-box; resize: vertical; min-height: 100px;"></textarea>
+            </div>
+            
+            <button type="submit" style="width: 100%; padding: 0.75rem; background: #dc3545; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; font-weight: 600;">Confirm Cancellation</button>
+            <button type="button" onclick="closeCancelModal()" style="width: 100%; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 0.5rem;">Keep Order</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCancelModal(orderID) {
+        document.getElementById('cancel_order_id').value = orderID;
+        document.getElementById('cancelModal').style.display = 'block';
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('cancelModal');
+        if (event.target == modal) {
+            closeCancelModal();
+        }
+    }
 </script>
 
 <?php include 'includes/footer.php'; ?>

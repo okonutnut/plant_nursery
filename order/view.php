@@ -108,6 +108,14 @@ include '../includes/header.php';
                 <span><?php echo htmlspecialchars($order['PaymentMethod']); ?></span>
             </div>
             <?php endif; ?>
+            <?php if ($order['Status'] === 'Cancelled' && !empty($order['CancellationReason'])): ?>
+            <div class="col-12 mb-3">
+                <strong>Cancellation Reason:</strong>
+                <div style="background: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 5px; margin-top: 0.25rem;">
+                    <?php echo htmlspecialchars($order['CancellationReason']); ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
