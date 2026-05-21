@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employeeID = $_POST['EmployeeID'] ? $_POST['EmployeeID'] : 'NULL';
     $orderDate = mysqli_real_escape_string($conn, $_POST['OrderDate']);
     $status = mysqli_real_escape_string($conn, $_POST['Status']);
+    $paymentMethod = mysqli_real_escape_string($conn, $_POST['PaymentMethod'] ?? '');
     
     // Get old order status and items
     $oldOrder = mysqli_query($conn, "SELECT Status FROM `order` WHERE OrderID = $id");
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        $sql = "UPDATE `order` SET CustomerID = $customerID, EmployeeID = $employeeID, OrderDate = '$orderDate', TotalAmount = $totalAmount, Status = '$status' WHERE OrderID = $id";
+        $sql = "UPDATE `order` SET CustomerID = $customerID, EmployeeID = $employeeID, OrderDate = '$orderDate', TotalAmount = $totalAmount, Status = '$status', PaymentMethod = " . ($paymentMethod ? "'$paymentMethod'" : "NULL") . " WHERE OrderID = $id";
         mysqli_query($conn, $sql);
         
         // Delete existing items
@@ -178,6 +179,17 @@ include '../includes/header.php';
                         <option value="Processing" <?php echo $order['Status'] === 'Processing' ? 'selected' : ''; ?>>Processing</option>
                         <option value="Completed" <?php echo $order['Status'] === 'Completed' ? 'selected' : ''; ?>>Completed</option>
                         <option value="Cancelled" <?php echo $order['Status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="PaymentMethod" class="form-label">Payment Method</label>
+                    <select class="form-select" id="PaymentMethod" name="PaymentMethod">
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash on Delivery" <?php echo ($order['PaymentMethod'] ?? '') == 'Cash on Delivery' ? 'selected' : ''; ?>>Cash on Delivery</option>
+                        <option value="GCash" <?php echo ($order['PaymentMethod'] ?? '') == 'GCash' ? 'selected' : ''; ?>>GCash</option>
+                        <option value="Bank Transfer" <?php echo ($order['PaymentMethod'] ?? '') == 'Bank Transfer' ? 'selected' : ''; ?>>Bank Transfer</option>
                     </select>
                 </div>
             </div>

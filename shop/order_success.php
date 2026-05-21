@@ -79,6 +79,9 @@ include 'includes/header.php';
                 <p><strong>Order Date:</strong> <?php echo date('F d, Y', strtotime($order['OrderDate'])); ?></p>
                 <p><strong>Status:</strong> <?php echo htmlspecialchars($order['Status']); ?></p>
                 <p><strong>Total Amount:</strong> $<?php echo number_format($order['TotalAmount'], 2); ?></p>
+                <?php if (!empty($order['PaymentMethod'])): ?>
+                <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($order['PaymentMethod']); ?></p>
+                <?php endif; ?>
                 
                 <h4 style="margin-top: 2rem;">Order Items:</h4>
                 <?php foreach ($items as $item): ?>

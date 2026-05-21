@@ -85,11 +85,13 @@ include '../includes/header.php';
                 <span class="badge" style="padding: 0.25rem 0.75rem; border-radius: 20px; background-color: 
                     <?php 
                     echo $order['Status'] === 'Completed' ? '#d4edda' : 
-                        ($order['Status'] === 'Pending' ? '#fff3cd' : '#f8d7da'); 
+                        ($order['Status'] === 'Pending' ? '#fff3cd' : 
+                            ($order['Status'] === 'Cancelled' ? '#f8d7da' : '#f8d7da')); 
                     ?>; color: 
                     <?php 
                     echo $order['Status'] === 'Completed' ? '#155724' : 
-                        ($order['Status'] === 'Pending' ? '#856404' : '#721c24'); 
+                        ($order['Status'] === 'Pending' ? '#856404' : 
+                            ($order['Status'] === 'Cancelled' ? '#721c24' : '#721c24')); 
                     ?>;">
                     <?php echo htmlspecialchars($order['Status']); ?>
                 </span>
@@ -100,6 +102,12 @@ include '../includes/header.php';
                     $<?php echo number_format($order['TotalAmount'], 2); ?>
                 </span>
             </div>
+            <?php if (!empty($order['PaymentMethod'])): ?>
+            <div class="col-md-6 mb-3">
+                <strong>Payment Method:</strong>
+                <span><?php echo htmlspecialchars($order['PaymentMethod']); ?></span>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

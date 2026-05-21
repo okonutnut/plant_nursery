@@ -63,6 +63,18 @@ $pageTitle = 'My Orders';
 include 'includes/header.php';
 ?>
 
+<?php if (isset($_GET['success'])): ?>
+    <div style="background: #d4edda; color: #155724; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; border-left: 4px solid #28a745;">
+        <?php echo htmlspecialchars($_GET['success']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; border-left: 4px solid #dc3545;">
+        <?php echo htmlspecialchars($_GET['error']); ?>
+    </div>
+<?php endif; ?>
+
 <style>
     .orders-card {
         background: white;
@@ -261,6 +273,9 @@ $cartCount = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
                                 </td>
                                 <td>
                                     <a href="view_order.php?id=<?php echo $order['OrderID']; ?>" class="btn-view">View Details</a>
+                                    <?php if (strtolower($order['Status']) === 'pending'): ?>
+                                        <a href="cancel_order.php?id=<?php echo $order['OrderID']; ?>" class="btn-view" style="background: #dc3545;" onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.')">Cancel</a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php 

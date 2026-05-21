@@ -351,6 +351,12 @@ include 'includes/header.php';
                             </span>
                         </div>
                     </div>
+                    <?php if (!empty($order['PaymentMethod'])): ?>
+                    <div class="info-group">
+                        <label>Payment Method</label>
+                        <div class="value"><?php echo htmlspecialchars($order['PaymentMethod']); ?></div>
+                    </div>
+                    <?php endif; ?>
                     <div class="info-group">
                         <label>Total Amount</label>
                         <div class="value" style="font-size: 1.5rem; color: var(--primary-color); font-weight: bold;">
@@ -405,6 +411,16 @@ include 'includes/header.php';
                         <label>Address</label>
                         <div class="value"><?php echo htmlspecialchars($order['CustomerAddress'] ?? 'N/A'); ?></div>
                     </div>
+                    <?php if (strtolower($order['Status']) === 'pending'): ?>
+                    <div class="info-group">
+                        <label>Actions</label>
+                        <div class="value">
+                            <a href="cancel_order.php?id=<?php echo $orderID; ?>" class="btn-request-refund" style="background: #dc3545; color: white; text-decoration: none;" onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.')">
+                                <i class="fas fa-times-circle"></i> Cancel Order
+                            </a>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -417,7 +433,10 @@ include 'includes/header.php';
             <?php else: ?>
                 The 30-day warranty period for this order has expired.
             <?php endif; ?>
-            <?php if (!$isOrderCompleted): ?>
+            <?php if (strtolower($order['Status']) === 'cancelled'): ?>
+                <br><br>
+                <strong style="color: #721c24;"><i class="fas fa-times-circle"></i> Order Cancelled:</strong> This order has been cancelled. No further actions are available.
+            <?php elseif (!$isOrderCompleted): ?>
                 <br><br>
                 <strong style="color: #856404;">⚠️ Note:</strong> Refund requests can only be made for orders with "Completed" status. Your order status is currently: <strong><?php echo htmlspecialchars($order['Status']); ?></strong>
             <?php elseif ($isOrderSuccessful): ?>
@@ -475,6 +494,8 @@ include 'includes/header.php';
                                             Request Refund
                                         </button>
                                     <?php endif; ?>
+                                <?php elseif (strtolower($order['Status']) === 'cancelled'): ?>
+                                    <span style="color: #721c24; font-size: 0.9rem; font-weight: 500;"><i class="fas fa-times-circle"></i> Order Cancelled</span>
                                 <?php elseif ($isOrderSuccessful): ?>
                                     <span style="color: #28a745; font-size: 0.9rem; font-weight: 500;"><i class="fas fa-check-circle"></i> Order Successful</span>
                                 <?php elseif (!$isOrderCompleted): ?>

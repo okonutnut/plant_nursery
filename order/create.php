@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employeeID = $_POST['EmployeeID'] ? $_POST['EmployeeID'] : 'NULL';
     $orderDate = mysqli_real_escape_string($conn, $_POST['OrderDate']);
     $status = mysqli_real_escape_string($conn, $_POST['Status']);
+    $paymentMethod = mysqli_real_escape_string($conn, $_POST['PaymentMethod'] ?? '');
     
     // Check if quantities are available (always validate regardless of status)
     if (isset($_POST['items']) && is_array($_POST['items'])) {
@@ -47,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        $sql = "INSERT INTO `order` (CustomerID, EmployeeID, OrderDate, TotalAmount, Status) VALUES ($customerID, $employeeID, '$orderDate', $totalAmount, '$status')";
+        $sql = "INSERT INTO `order` (CustomerID, EmployeeID, OrderDate, TotalAmount, Status, PaymentMethod) VALUES ($customerID, $employeeID, '$orderDate', $totalAmount, '$status', " . ($paymentMethod ? "'$paymentMethod'" : "NULL") . ")";
         if (mysqli_query($conn, $sql)) {
             $orderID = mysqli_insert_id($conn);
             
@@ -129,6 +130,17 @@ include '../includes/header.php';
                         <option value="Processing">Processing</option>
                         <option value="Completed">Completed</option>
                         <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="PaymentMethod" class="form-label">Payment Method</label>
+                    <select class="form-select" id="PaymentMethod" name="PaymentMethod">
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash on Delivery">Cash on Delivery</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
                     </select>
                 </div>
             </div>

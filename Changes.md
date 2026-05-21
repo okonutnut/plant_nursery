@@ -17,3 +17,8 @@
 - Shipping information automatically linked to current user's account
 - Customer record created and linked to user if not exists during checkout
 - Form pre-filled with existing customer information when available
+
+## Cancel Order & Payment Method
+- **Cancel Order**: Customers can cancel their own orders while status is "Pending" (not yet shipped/approved). Cancel button appears on My Orders list and Order Detail page. Cancelled orders display with red badge and cannot be approved by sellers.
+- **Payment Method**: Customers select payment method (Cash on Delivery, GCash, Bank Transfer) during checkout. Displayed on order success page, customer order detail, seller view, and admin panels. Added `PaymentMethod` column to `order` table.
+- Seller and admin approve flows now reject cancelled orders with an error message.

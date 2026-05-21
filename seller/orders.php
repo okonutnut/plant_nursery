@@ -33,6 +33,7 @@ $orders = mysqli_fetch_all($result, MYSQLI_ASSOC);
 // Get counts
 $pendingCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM `order` WHERE Status = 'Pending'"))['count'];
 $completedCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM `order` WHERE Status = 'Completed'"))['count'];
+$cancelledCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM `order` WHERE Status = 'Cancelled'"))['count'];
 $totalCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM `order`"))['count'];
 
 $pageTitle = 'Manage Orders';
@@ -51,11 +52,12 @@ include 'includes/header.php';
                     <label for="statusFilter" style="font-weight: 500; color: var(--text-color);">
                         <i class="fas fa-filter"></i> Filter:
                     </label>
-                    <select id="statusFilter" onchange="filterByStatus()" style="min-width: 150px;">
-                        <option value="all" <?php echo $statusFilter === 'all' ? 'selected' : ''; ?>>All Orders</option>
-                        <option value="Pending" <?php echo $statusFilter === 'Pending' ? 'selected' : ''; ?>>Pending</option>
-                        <option value="Completed" <?php echo $statusFilter === 'Completed' ? 'selected' : ''; ?>>Completed</option>
-                    </select>
+                        <select id="statusFilter" onchange="filterByStatus()" style="min-width: 150px;">
+                            <option value="all" <?php echo $statusFilter === 'all' ? 'selected' : ''; ?>>All Orders</option>
+                            <option value="Pending" <?php echo $statusFilter === 'Pending' ? 'selected' : ''; ?>>Pending</option>
+                            <option value="Completed" <?php echo $statusFilter === 'Completed' ? 'selected' : ''; ?>>Completed</option>
+                            <option value="Cancelled" <?php echo $statusFilter === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                        </select>
                 </div>
             </div>
 
@@ -67,6 +69,10 @@ include 'includes/header.php';
                 <div class="stat-card" style="border-left-color: #28a745;">
                     <div class="number" style="color: #28a745;"><?php echo $completedCount; ?></div>
                     <div><i class="fas fa-check-circle"></i> Completed Orders</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #dc3545;">
+                    <div class="number" style="color: #dc3545;"><?php echo $cancelledCount; ?></div>
+                    <div><i class="fas fa-times-circle"></i> Cancelled Orders</div>
                 </div>
                 <div class="stat-card" style="border-left-color: var(--primary-color);">
                     <div class="number" style="color: var(--primary-color);"><?php echo $totalCount; ?></div>
@@ -111,6 +117,8 @@ include 'includes/header.php';
                                                 <i class="fas fa-check-circle"></i>
                                             <?php elseif ($order['Status'] === 'Pending'): ?>
                                                 <i class="fas fa-clock"></i>
+                                            <?php elseif ($order['Status'] === 'Cancelled'): ?>
+                                                <i class="fas fa-times-circle"></i>
                                             <?php else: ?>
                                                 <i class="fas fa-times-circle"></i>
                                             <?php endif; ?>

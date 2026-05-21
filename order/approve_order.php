@@ -36,6 +36,11 @@ if ($order['Status'] === 'Completed') {
     exit;
 }
 
+if ($order['Status'] === 'Cancelled') {
+    header("Location: view.php?id=$orderID&error=Cannot approve a cancelled order");
+    exit;
+}
+
 // Get employee ID from user
 $userID = $_SESSION['user_id'];
 $userResult = mysqli_query($conn, "SELECT EmployeeID FROM user WHERE UserID = $userID");

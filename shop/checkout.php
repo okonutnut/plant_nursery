@@ -105,10 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $totalAmount += $item['Price'] * $item['Quantity'];
             }
             
+            // Get payment method
+            $paymentMethod = mysqli_real_escape_string($conn, $_POST['payment_method'] ?? 'Cash on Delivery');
+
             // Create order with status 'Pending'
             $orderDate = date('Y-m-d');
             $status = 'Pending';
-            $orderSql = "INSERT INTO `order` (CustomerID, EmployeeID, OrderDate, TotalAmount, Status) VALUES ($customerID, NULL, '$orderDate', $totalAmount, '$status')";
+            $orderSql = "INSERT INTO `order` (CustomerID, EmployeeID, OrderDate, TotalAmount, Status, PaymentMethod) VALUES ($customerID, NULL, '$orderDate', $totalAmount, '$status', '$paymentMethod')";
             
             if (!mysqli_query($conn, $orderSql)) {
                 throw new Exception('Error creating order: ' . mysqli_error($conn));
@@ -264,6 +267,15 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="address">Address</label>
                         <textarea id="address" name="address" rows="3"><?php echo htmlspecialchars($customer['Address'] ?? $_POST['address'] ?? ''); ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method *</label>
+                        <select id="payment_method" name="payment_method" class="form-control" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; box-sizing: border-box;">
+                            <option value="Cash on Delivery" <?php echo ($_POST['payment_method'] ?? '') == 'Cash on Delivery' ? 'selected' : ''; ?>>Cash on Delivery</option>
+                            <option value="GCash" <?php echo ($_POST['payment_method'] ?? '') == 'GCash' ? 'selected' : ''; ?>>GCash</option>
+                            <option value="Bank Transfer" <?php echo ($_POST['payment_method'] ?? '') == 'Bank Transfer' ? 'selected' : ''; ?>>Bank Transfer</option>
+                        </select>
                     </div>
                     
                     <button type="submit" class="btn-place-order">Place Order</button>

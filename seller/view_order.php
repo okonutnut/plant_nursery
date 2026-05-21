@@ -57,9 +57,12 @@ include 'includes/header.php';
                 <?php echo htmlspecialchars($_GET['error']); ?>
             </div>
         <?php endif; ?>
-        <?php if ($order['Status'] === 'Pending'): ?>
-            <a href="approve_order.php?id=<?php echo $orderID; ?>" class="btn btn-primary" onclick="return confirm('Approve and complete this order? This will decrease plant inventory.')">✓ Approve Order</a>
-        <?php endif; ?>
+            <?php if ($order['Status'] === 'Pending'): ?>
+                <a href="approve_order.php?id=<?php echo $orderID; ?>" class="btn btn-primary" onclick="return confirm('Approve and complete this order? This will decrease plant inventory.')">✓ Approve Order</a>
+            <?php endif; ?>
+            <?php if ($order['Status'] === 'Cancelled'): ?>
+                <span style="padding: 0.5rem 1rem; border-radius: 5px; background-color: #f8d7da; color: #721c24; font-weight: 500; display: inline-block;">Order Cancelled by Customer</span>
+            <?php endif; ?>
         <a href="orders.php" class="btn btn-secondary">← Back to Orders</a>
     </div>
 </div>
@@ -94,19 +97,27 @@ include 'includes/header.php';
                 <tr>
                     <th>Status</th>
                     <td>
-                        <span style="padding: 0.5rem 1rem; border-radius: 20px; background-color: 
+                        <span style="padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500; background-color: 
                             <?php 
                             echo $order['Status'] === 'Completed' ? '#d4edda' : 
-                                ($order['Status'] === 'Pending' ? '#fff3cd' : '#f8d7da'); 
+                                ($order['Status'] === 'Pending' ? '#fff3cd' : 
+                                    ($order['Status'] === 'Cancelled' ? '#f8d7da' : '#f8d7da')); 
                             ?>; color: 
                             <?php 
                             echo $order['Status'] === 'Completed' ? '#155724' : 
-                                ($order['Status'] === 'Pending' ? '#856404' : '#721c24'); 
-                            ?>; font-weight: 500;">
+                                ($order['Status'] === 'Pending' ? '#856404' : 
+                                    ($order['Status'] === 'Cancelled' ? '#721c24' : '#721c24')); 
+                            ?>;">
                             <?php echo htmlspecialchars($order['Status']); ?>
                         </span>
                     </td>
                 </tr>
+                <?php if (!empty($order['PaymentMethod'])): ?>
+                <tr>
+                    <th>Payment Method</th>
+                    <td><?php echo htmlspecialchars($order['PaymentMethod']); ?></td>
+                </tr>
+                <?php endif; ?>
                 <tr>
                     <th>Total Amount</th>
                     <td style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);">
