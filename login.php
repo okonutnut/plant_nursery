@@ -56,7 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $customerID = null;
                         $employeeID = null;
                         $supplierID = null;
-                        $isActive = 1; // Default to active
+                        $isActive = 0; // All accounts require admin approval
+                        
+                        // Generate email verification token
+                        $verificationToken = bin2hex(random_bytes(32));
                         
                         if ($role === 'customer') {
                             // Insert customer
@@ -67,9 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $customerID = mysqli_insert_id($conn);
                         } elseif ($role === 'supplier') {
                             // For supplier, create supplier record
-                            // Set IsActive to 0 (pending approval)
-                            $isActive = 0;
-                            
                             $supSql = "INSERT INTO supplier (Name, Contact, Email, Address) VALUES ('$name', '$phone', '$email', '$address')";
                             if (!mysqli_query($conn, $supSql)) {
                                 throw new Exception('Error creating supplier record: ' . mysqli_error($conn));
@@ -77,9 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $supplierID = mysqli_insert_id($conn);
                         } else {
                             // For admin, staff, and seller, create employee record
-                            // Set IsActive to 0 (pending approval)
-                            $isActive = 0;
-                            
                             // Map role to employee role field
                             // Seller and staff are the same, both use 'seller' role
                             $employeeRole = ($role === 'admin') ? 'admin' : 'seller';
@@ -92,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         
                         // Create user account in user table
-                        $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, EmployeeID, SupplierID, IsActive) VALUES ('$username', '$password', '$email', '$role', " . 
-                                   ($customerID ? $customerID : 'NULL') . ", " . ($employeeID ? $employeeID : 'NULL') . ", " . ($supplierID ? $supplierID : 'NULL') . ", $isActive)";
+                        $userSql = "INSERT INTO user (Username, Password, Email, Role, CustomerID, EmployeeID, SupplierID, IsActive, EmailVerified, VerificationToken) VALUES ('$username', '$password', '$email', '$role', " . 
+                                   ($customerID ? $customerID : 'NULL') . ", " . ($employeeID ? $employeeID : 'NULL') . ", " . ($supplierID ? $supplierID : 'NULL') . ", $isActive, 0, '$verificationToken')";
                         if (!mysqli_query($conn, $userSql)) {
                             throw new Exception('Error creating user account: ' . mysqli_error($conn));
                         }
@@ -103,24 +100,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Commit transaction
                         mysqli_commit($conn);
                         
-                        if ($role === 'customer' && $isActive == 1) {
-                            // Automatically log in the newly registered customer
-                            $_SESSION['user_id'] = $userID;
-                            $_SESSION['username'] = $username;
-                            $_SESSION['role'] = 'customer';
-                            $_SESSION['email'] = $email;
-                            
-                            // Update last login
-                            mysqli_query($conn, "UPDATE user SET LastLogin = NOW() WHERE UserID = $userID");
-                            
-                            // Redirect to shop page for customers
-                            header("Location: shop/shop.php");
-                            exit;
+                        require_once 'includes/mail_helper.php';
+                        
+                        // Send verification email
+                        $emailSent = sendVerificationEmail($email, $username, $verificationToken);
+                        
+                        if ($emailSent) {
+                            $success = 'Registration successful! A verification link has been sent to your email. Please verify your email before an administrator can approve your account.';
                         } else {
-                            // For admin/staff/seller/supplier, show success message (pending approval)
-                            $success = 'Registration successful! Your account is pending approval by an administrator. You will be able to login once your account is approved.';
-                            $isRegister = true; // Keep registration form visible
+                            $success = 'Registration successful! However, we could not send the verification email. Please contact support. Your account is pending approval.';
                         }
+                        $isRegister = true; // Keep registration form visible
                     } catch (Exception $e) {
                         // Rollback transaction on error
                         mysqli_rollback($conn);
@@ -142,7 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($user && $user['Password'] === $password) {
                 // Check if account is active
-                if ($user['IsActive'] == 0) {
+                if ($user['EmailVerified'] == 0) {
+                    $error = 'Please verify your email address before logging in. Check your inbox for the verification link.';
+                } elseif ($user['IsActive'] == 0) {
                     $error = 'Your account is pending approval. Please wait for an administrator to approve your account before logging in.';
                 } else {
                     // Login successful
